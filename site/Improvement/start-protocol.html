@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start before you feel ready</title>
+<meta name="theme-color" content="#0B0B11">
+<meta name="description" content="Task initiation protocol: 10-minute starts, thought interceptor, triage tree.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Start">
+<script>
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0B11;
+    --panel: #12131C;
+    --panel-2: #171826;
+    --ink: #E9E7E4;
+    --soft: #9C9DAD;
+    --faint: #5E5F72;
+    --red: #FF3B47;
+    --red-deep: #B01E2B;
+    --red-glow: rgba(255, 59, 71, 0.35);
+    --cyan: #4ADEE0;
+    --cyan-bg: rgba(74, 222, 224, 0.07);
+    --yellow: #FFC53D;
+    --yellow-bg: rgba(255, 197, 61, 0.08);
+    --green: #4ADE80;
+    --line: #262838;
+    --radius: 4px;
+    --disp: 'Chakra Petch', 'Archivo', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Archivo', system-ui, sans-serif;
+    background:
+      linear-gradient(rgba(38, 40, 56, 0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(38, 40, 56, 0.22) 1px, transparent 1px),
+      var(--bg);
+    background-size: 44px 44px, 44px 44px, auto;
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 17px;
+  }
+  /* scanlines */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 1px, transparent 1px 3px);
+    opacity: 0.5;
+  }
+  ::selection { background: var(--red); color: #0B0B11; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+  a { color: var(--red); }
+  button { font-family: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+  /* ---------- header ---------- */
+  header { padding: 28px 0 0; }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .eyebrow .kat { color: var(--red); letter-spacing: 0.3em; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 44px 0 56px; position: relative; }
+  .hero::before {
+    content: '始';
+    position: absolute; top: -30px; right: -10px;
+    font-family: var(--disp); font-weight: 700;
+    font-size: clamp(160px, 40vw, 300px); line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 59, 71, 0.18);
+    pointer-events: none; user-select: none; z-index: 0;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.1; letter-spacing: 0.01em; max-width: 15ch;
+    text-shadow: 0 0 24px var(--red-glow);
+  }
+  .hero h1::after { content: '_'; color: var(--red); }
+  .hero p.sub { margin-top: 14px; color: var(--soft); max-width: 46ch; }
+
+  .commit {
+    margin-top: 36px; background: var(--panel);
+    border: 1px solid var(--line); padding: 26px 24px 24px;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+  .commit-line { font-size: clamp(20px, 4vw, 26px); font-weight: 500; line-height: 1.5; }
+  .commit-line input {
+    font-family: 'Archivo', sans-serif; font-size: inherit; font-weight: 700;
+    border: none; border-bottom: 2px solid var(--red);
+    background: transparent; color: var(--ink);
+    width: 100%; max-width: 100%; padding: 2px 4px; border-radius: 0;
+    caret-color: var(--red);
+  }
+  .commit-line input::placeholder { color: var(--faint); font-weight: 400; }
+  .chips { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chips span.lbl { font-size: 13px; color: var(--soft); margin-right: 4px; }
+  .chip {
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    border: 1px solid var(--line); background: transparent; color: var(--soft);
+    padding: 6px 14px; border-radius: 2px;
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--red); border-color: var(--red); color: #0B0B11; font-weight: 600;
+    box-shadow: 0 0 14px var(--red-glow);
+  }
+  .ritual { margin-top: 18px; }
+  .rit-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 8px; }
+  .rit-item { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--soft); margin: 7px 0; cursor: pointer; }
+  .rit-item input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--red); flex-shrink: 0; }
+  .start-btn {
+    margin-top: 22px; width: 100%;
+    background: var(--red); color: #0B0B11; border: none;
+    font-family: var(--disp); font-size: 18px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 16px; border-radius: 0;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    box-shadow: 0 0 22px var(--red-glow);
+    transition: transform 0.08s ease, box-shadow 0.15s ease;
+  }
+  .start-btn:hover { box-shadow: 0 0 34px var(--red-glow); }
+  .start-btn:active { transform: scale(0.985); }
+  .start-hint { margin-top: 10px; font-size: 13px; color: var(--faint); text-align: center; }
+
+  /* ---------- session mode ---------- */
+  .session { display: none; margin-top: 36px; text-align: center; }
+  .session.on { display: block; }
+  .session .doing { font-size: 15px; color: var(--soft); max-width: 40ch; margin: 0 auto; }
+  .session .doing strong { color: var(--ink); }
+  .clock {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: clamp(64px, 18vw, 112px); letter-spacing: -0.02em;
+    line-height: 1.1; margin-top: 8px; font-variant-numeric: tabular-nums;
+    color: var(--red);
+    text-shadow: 0 0 18px var(--red-glow), 0 0 60px rgba(255, 59, 71, 0.2);
+  }
+  .clock.done { color: var(--green); text-shadow: 0 0 18px rgba(74, 222, 128, 0.4); }
+  .session-actions { margin-top: 12px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .ghost-btn {
+    background: transparent; border: 1px solid var(--line); color: var(--soft);
+    font-family: var(--disp); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 10px 16px; border-radius: 2px;
+  }
+  .ghost-btn:hover { border-color: var(--red); color: var(--red); }
+  .later-box { margin-top: 26px; text-align: left; }
+  .later-box label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+  .later-input-row { display: flex; gap: 8px; margin-top: 8px; }
+  .later-input-row input {
+    flex: 1; font-family: inherit; font-size: 15px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 2px; background: var(--panel); color: var(--ink);
+    caret-color: var(--red);
+  }
+  .later-input-row button {
+    background: var(--ink); color: #0B0B11; border: none; padding: 10px 16px;
+    border-radius: 2px; font-family: var(--disp); font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  ul.later-list { list-style: none; margin-top: 10px; }
+  ul.later-list li {
+    font-size: 15px; color: var(--soft); padding: 8px 12px;
+    border-left: 2px solid var(--red-deep); margin-bottom: 6px; background: var(--panel);
+  }
+  .return-note { margin-top: 10px; font-size: 13px; color: var(--green); font-weight: 500; display: none; }
+  .return-note.show { display: block; }
+  .done-panel { display: none; margin-top: 24px; padding: 20px; background: var(--panel); border: 1px solid var(--green); }
+  .done-panel.show { display: block; }
+  .done-panel p { font-size: 16px; color: var(--soft); }
+  .done-panel .big { font-family: var(--disp); font-weight: 700; font-size: 20px; color: var(--green); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* ---------- sections ---------- */
+  section { padding: 52px 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(21px, 4vw, 26px); letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  h2::before { content: '// '; color: var(--red); }
+  .sec-sub { color: var(--soft); max-width: 52ch; margin-bottom: 28px; }
+
+  /* loop */
+  ol.loop { list-style: none; counter-reset: step; }
+  ol.loop li {
+    counter-increment: step; display: grid; grid-template-columns: 40px 1fr;
+    gap: 16px; padding: 16px 0; border-bottom: 1px dashed var(--line);
+  }
+  ol.loop li:last-child { border-bottom: none; }
+  ol.loop li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600;
+    color: var(--red); padding-top: 3px;
+    text-shadow: 0 0 10px var(--red-glow);
+  }
+  ol.loop strong { display: block; font-family: var(--disp); font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+  ol.loop p { font-size: 15px; color: var(--soft); margin-top: 2px; }
+  .why {
+    margin-top: 24px; padding: 16px 18px; background: var(--panel);
+    border-left: 2px solid var(--red); font-size: 15px; color: var(--soft);
+  }
+
+  /* thought cards */
+  .tcard { border: 1px solid var(--line); overflow: hidden; margin-bottom: 12px; background: var(--panel); }
+  .tcard > button {
+    width: 100%; text-align: left; background: var(--cyan-bg); border: none;
+    border-left: 2px solid var(--cyan);
+    padding: 16px 18px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline;
+  }
+  .tcard > button .q { font-size: 17px; font-weight: 500; color: var(--cyan); font-style: italic; }
+  .tcard > button .tog {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--cyan);
+    white-space: nowrap; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .tcard .counter { display: none; padding: 16px 18px; }
+  .tcard.open .counter { display: block; }
+  .tcard .counter .say { font-weight: 700; font-size: 16px; color: var(--ink); }
+  .tcard .counter .act {
+    margin-top: 8px; font-size: 15px; color: var(--soft);
+    padding-left: 14px; border-left: 2px solid var(--red);
+  }
+
+  /* downshift */
+  .ladder { display: flex; flex-direction: column; gap: 0; }
+  .rung { display: grid; grid-template-columns: 40px 1fr; gap: 16px; padding: 14px 0; }
+  .rung .n {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px;
+    color: var(--yellow); padding-top: 2px;
+  }
+  .rung strong { font-family: var(--disp); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+  .rung p { font-size: 15px; color: var(--soft); }
+  .warn-note {
+    margin-top: 16px; padding: 14px 16px 14px 28px; position: relative;
+    background: var(--yellow-bg); color: var(--yellow);
+    font-size: 15px; font-weight: 500; overflow: hidden;
+  }
+  .warn-note::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
+    background: repeating-linear-gradient(45deg, var(--yellow) 0 7px, #0B0B11 7px 14px);
+    opacity: 0.85;
+  }
+
+  /* day 14 */
+  .d14 { background: var(--panel); border: 1px solid var(--line); padding: 24px; }
+  .d14 label { font-size: 15px; color: var(--soft); display: block; margin-bottom: 12px; }
+  .d14-row { display: flex; align-items: center; gap: 16px; }
+  .d14-row input[type="range"] { flex: 1; accent-color: var(--red); }
+  .d14-row output {
+    font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600;
+    min-width: 88px; text-align: right; font-variant-numeric: tabular-nums;
+    color: var(--red); text-shadow: 0 0 12px var(--red-glow);
+  }
+  .verdict { margin-top: 20px; padding: 16px 18px; font-size: 15px; }
+  .verdict strong { display: block; font-family: var(--disp); font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .verdict.good { background: rgba(74, 222, 128, 0.08); color: var(--green); border-left: 2px solid var(--green); }
+  .verdict.mid { background: var(--yellow-bg); color: var(--yellow); border-left: 2px solid var(--yellow); }
+  .verdict.low { background: rgba(255, 59, 71, 0.09); color: var(--red); border-left: 2px solid var(--red); }
+
+  /* decision tree wizard */
+  .wizard { background: var(--panel); border: 1px solid var(--line); padding: 24px;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+  .wq { font-family: var(--disp); font-size: 19px; font-weight: 600; letter-spacing: 0.02em; }
+  .wstep { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+  .wopts { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .wopt {
+    text-align: left; background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 2px; padding: 13px 16px; font-size: 16px; color: var(--ink);
+    transition: border-color 0.1s ease, background 0.1s ease;
+  }
+  .wopt:hover { border-color: var(--red); background: rgba(255, 59, 71, 0.06); }
+  .wopt small { display: block; font-size: 13px; color: var(--faint); margin-top: 2px; }
+  .wback { margin-top: 16px; background: none; border: none; font-size: 14px; color: var(--faint); text-decoration: underline; padding: 4px 0; }
+  .wback:hover { color: var(--red); }
+  .wresult .rhead { font-family: var(--disp); font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-shadow: 0 0 16px var(--red-glow); }
+  .wresult .rrow { display: grid; grid-template-columns: 96px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+  .wresult .rrow:last-of-type { border-bottom: none; }
+  .wresult .rlbl { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); padding-top: 4px; }
+  .wresult .rval { font-size: 16px; color: var(--ink); }
+  .wnotes { margin-top: 14px; }
+  .wnotes li { font-size: 14px; color: var(--soft); margin: 6px 0 6px 18px; }
+  .wactions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .wactions .primary {
+    background: var(--red); color: #0B0B11; border: none;
+    font-family: var(--disp); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 13px 20px; border-radius: 0;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    box-shadow: 0 0 16px var(--red-glow);
+  }
+
+  /* tracker + persistence UI */
+  .track-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 320px; }
+  .track-grid .cell { aspect-ratio: 1; background: var(--panel-2); border: 1px solid var(--line); }
+  .track-grid .cell.on { background: var(--red); border-color: var(--red); box-shadow: 0 0 10px var(--red-glow); }
+  .track-grid .cell.today { outline: 1px dashed var(--faint); outline-offset: 2px; }
+  .track-stats { margin-top: 14px; font-size: 13px; letter-spacing: 0.08em; color: var(--soft); text-transform: uppercase; }
+  .track-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .track-note { margin-top: 10px; font-size: 13px; color: var(--faint); }
+  .mark-btn {
+    margin-top: 14px; background: var(--green); color: #0B0B11; border: none;
+    font-family: var(--disp); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 15px; padding: 12px 18px;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  }
+  .marked-note { margin-top: 8px; font-size: 13px; color: var(--green); min-height: 1.2em; }
+  .next-box { margin-top: 16px; text-align: left; }
+  .next-box label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); display: block; }
+  .next-box input { width: 100%; margin-top: 6px; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); caret-color: var(--red); }
+  .next-box button { margin-top: 8px; }
+  .lastnext { margin-top: 10px; font-size: 14px; color: var(--soft); }
+  .lastnext:empty { display: none; }
+  .use-next { margin-left: 6px; background: transparent; border: 1px solid var(--red); color: var(--red); font-size: 12px; padding: 4px 10px; text-transform: uppercase; font-family: var(--disp); }
+  .card-edit { margin-top: 12px; background: none; border: none; color: var(--faint); font-size: 12px; text-decoration: underline; padding: 0; }
+  .card-edit:hover { color: var(--red); }
+  .card-form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .card-form label { font-size: 12px; color: var(--faint); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+  .card-form input { display: block; width: 100%; margin-top: 4px; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); }
+  .card-save { align-self: flex-start; background: var(--red); color: #0B0B11; border: none; font-family: var(--disp); font-weight: 700; text-transform: uppercase; font-size: 13px; padding: 8px 14px; }
+
+  footer { padding: 40px 0 64px; border-top: 1px solid var(--line); }
+  footer p { font-size: 13px; color: var(--faint); max-width: 60ch; }
+
+  @media (max-width: 480px) {
+    .hero::before { font-size: 150px; top: -16px; }
+    .wresult .rrow { grid-template-columns: 1fr; gap: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .start-btn, .wopt, .ghost-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <span class="eyebrow"><span class="kat">初動プロトコル</span> // TASK INITIATION PROTOCOL v2.1</span>
+</header>
+
+<div class="wrap hero">
+  <h1>Start before you feel ready.</h1>
+  <p class="sub">The hardest part of a task is the transition into it, not the task itself. This page exists to get you through that transition in the next sixty seconds.</p>
+
+  <div class="commit" id="commit">
+    <div class="commit-line">
+      For the next <span class="mono" id="dur-label">10</span> minutes I am doing:
+      <input type="text" id="task-input" placeholder="wash three dishes · read pages 4–7 · prep the 5-min explanation of X" aria-label="The task for this session">
+    </div>
+    <p class="lastnext" id="lastnext"></p>
+    <div class="chips" role="group" aria-label="Session length">
+      <span class="lbl">Length</span>
+      <button class="chip" data-min="5" aria-pressed="false">5 min</button>
+      <button class="chip" data-min="10" aria-pressed="true">10 min</button>
+      <button class="chip" data-min="15" aria-pressed="false">15 min</button>
+    </div>
+    <div class="ritual" role="group" aria-label="Launch ritual">
+      <span class="rit-label">Launch ritual · 60 seconds · identical every day</span>
+      <label class="rit-item"><input type="checkbox"> Same spot — I'm in my start location</label>
+      <label class="rit-item"><input type="checkbox"> Cue on — the starting track is playing</label>
+      <label class="rit-item"><input type="checkbox"> Phone is in another room</label>
+      <label class="rit-item"><input type="checkbox"> I touched the task — file open, object in hand</label>
+    </div>
+    <button class="start-btn" id="start-btn">Start the timer</button>
+    <p class="start-hint">Vague counts. Imperfect counts. The win is beginning.</p>
+  </div>
+
+  <div class="session" id="session">
+    <p class="doing">Right now: <strong id="doing-text"></strong></p>
+    <div class="clock mono" id="clock">10:00</div>
+    <div class="session-actions">
+      <button class="ghost-btn" id="drift-btn">I drifted — bring me back</button>
+      <button class="ghost-btn" id="abandon-btn">End session</button>
+    </div>
+    <p class="return-note" id="return-note">Good. Returning is the skill. Two more minutes on the task.</p>
+    <div class="later-box">
+      <label for="later-input">Later — park the pulling thought here</label>
+      <div class="later-input-row">
+        <input type="text" id="later-input" placeholder="check that email · look up that thing">
+        <button id="later-add">Park it</button>
+      </div>
+      <ul class="later-list" id="later-list"></ul>
+    </div>
+    <div class="done-panel" id="done-panel">
+      <p class="big">Time. Stop, even mid-momentum.</p>
+      <p>Stopping on time is part of the training: a session doesn't need to feel productive to count.</p>
+      <button class="mark-btn" id="mark-btn">Mark today as started</button>
+      <p class="marked-note" id="marked-note"></p>
+      <div class="next-box">
+        <label for="next-input">Next time I start with</label>
+        <input type="text" id="next-input" placeholder="the exact first action of the next session">
+        <button class="ghost-btn" id="next-save">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Not sure? Triage it</h2>
+    <p class="sec-sub">Answer honestly and quickly — first instinct, under ten seconds each. The tree ends with a concrete prescription you can load straight into the timer. Deliberating over the answers is itself the avoidance pattern.</p>
+    <div class="wizard" id="wizard" aria-live="polite"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The loop</h2>
+    <p class="sec-sub">One protocol, once a day, any domain. Nothing else for the first twenty-one days.</p>
+    <ol class="loop">
+      <li><div><strong>Name it</strong><p>One sentence, physical and observable. "Wash three dishes," never "clean the house." "Read pages 4–7," never "study."</p></div></li>
+      <li><div><strong>Run the launch ritual</strong><p>Same spot, same starting track, phone to the other room, touch the task physically — file open, object in hand. Sixty seconds, identical every day. Repetition moves starting from motivation to environment: the ritual is the cue, not a warm-up. If it fails twice in a row on the same task, a person is the escalation — fallback, never the default.</p></div></li>
+      <li><div><strong>Timer on, phone in another room</strong><p>When a thought pulls you away, park it on the Later list and return for two more minutes. Returning counts as success, not failure.</p></div></li>
+      <li><div><strong>Stop on time</strong><p>Even mid-momentum. A session that ends on schedule teaches you sessions are cheap — which is exactly the belief perfectionism attacks.</p></div></li>
+      <li><div><strong>Mark the day</strong><p>Started or didn't. No journaling, no quality score, nothing else.</p></div></li>
+    </ol>
+    <p class="why">Why this works: a tiny first action lowers the cost of starting below the cost of avoiding. You are not training productivity — you are training the transition from intention to action. Researching methods, apps, or note systems is allowed only <em>after</em> the day's session.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The thoughts that block step 1</h2>
+    <p class="sec-sub">Before tapping, try to produce the counter yourself — that's retrieval practice on your own self-talk. Then say the script out loud and execute the move within thirty seconds. The script buys the window; the action is the intervention.</p>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I need to find the best method first."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"Preparation is replacing action. Ten ordinary minutes first."</p><p class="act">Start the timer with the ordinary method. Research is allowed after the session, never before.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I don't feel like it."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"I don't need to want it. I need five minutes and a smaller target."</p><p class="act">Shrink the target to one visible result — three dishes, one clear chair. Add music or a call.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"It's too big. There's no point starting."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"The task is not the unit. The start is the unit."</p><p class="act">Write the smallest physical first action and do only that. The rest is not today's problem.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I already drifted. Today is ruined."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"Returning is the skill I'm training. A good session can include several returns."</p><p class="act">Park the pulling thought on the Later list. Return for two minutes. That counts.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I'll reply when I can do it properly."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"A bridge beats silence."</p><p class="act">Send now: "I saw this. I'm busy, but I'll reply properly soon." Schedule the real reply if it matters.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I'll do it when the pressure is real."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"I don't wait for pressure. I manufacture it."</p><p class="act">Text one person: "Starting 10 minutes of X now, will confirm when done." Then start.</p></div></div>
+
+    <div class="tcard"><button aria-expanded="false"><span class="q">"I'll master it first, then show it."</span><span class="tog">show</span></button>
+      <div class="counter"><p class="say">"The demo date does the teaching. I schedule the display, then prepare it."</p><p class="act">Put a five-minute explanation on the calendar — a teammate, a doc, a post — then start today's session as prep for it. Being visibly mid-learning is the non-douchy version of the same fuel.</p></div></div>
+
+    <p class="why">These six are placeholders until you replace them. The version that works uses the exact sentences you actually catch yourself thinking — in whatever language they arrive in. Edit this file and swap them during week one.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The fuel</h2>
+    <p class="sec-sub">The honest motive: knowing more than the people around me, and showing it. Unmanaged, it rewards appearing knowledgeable and punishes being a visible beginner — perfectionist delay in a new outfit. Harnessed, it becomes the protégé effect: schedule the display before doing the work.</p>
+    <p class="why">The mechanic: commit today to a five-minute explanation on a named date — a teammate, an internal doc, a post. Every session between now and then is preparing the performance, not "studying." The payoff moves from someday-mastery to a deadline with an audience you chose.</p>
+    <div class="ladder">
+      <div class="rung"><span class="n">G1</span><div><strong>Explains well, not knows more</strong><p>The sustainable frame is being the person who explains things well. Same fuel, generosity-framed — it compounds instead of costing relationships.</p></div></div>
+      <div class="rung"><span class="n">G2</span><div><strong>Measure by can-build</strong><p>Never by can-talk-about. The motive will happily let those two diverge, and only one of them is real.</p></div></div>
+      <div class="rung"><span class="n">G3</span><div><strong>One domain of visible beginnerhood</strong><p>Kept permanently, as vaccination — without it the motive quietly steers you away from everything where you would look novice.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Two missed days in a row</h2>
+    <p class="sec-sub">Not a character verdict — data that the action is still too big. Downshift in this order:</p>
+    <div class="ladder">
+      <div class="rung"><span class="n">01</span><div><strong>Halve the timer</strong><p>Ten minutes becomes five. Five becomes two. There is no floor too low.</p></div></div>
+      <div class="rung"><span class="n">02</span><div><strong>Change location</strong><p>Different room, café, desk. Context carries habit; break the context that carries avoidance.</p></div></div>
+      <div class="rung"><span class="n">03</span><div><strong>Do it live on a call</strong><p>If solo starting keeps failing, stop starting solo. Full body doubling, every session.</p></div></div>
+    </div>
+    <p class="warn-note">Never respond to a missed day by redesigning the system. One variable, in order, nothing else.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The record</h2>
+    <p class="sec-sub">Started days, last 21. After day one, the streak is what each new day protects.</p>
+    <div class="track-grid" id="track-grid" aria-label="Started days, last 21 days"></div>
+    <div class="track-stats mono" id="track-stats"></div>
+    <div class="track-actions">
+      <button class="ghost-btn" id="mark-today-2">Mark today</button>
+      <button class="ghost-btn" id="export-btn">Export data</button>
+      <button class="ghost-btn" id="later-clear">Clear Later list</button>
+    </div>
+    <p class="track-note" id="storage-note">Clear the Later list weekly: schedule, do, or delete every item.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Day 21: the decision</h2>
+    <p class="sec-sub">Three weeks, not two — the ritual lever needs the longer runway to condition. An experiment still needs a branch at the end. Count your started days:</p>
+    <div class="d14">
+      <label for="d14-range">Days started out of 21</label>
+      <div class="d14-row">
+        <input type="range" id="d14-range" min="0" max="21" step="1" value="10" aria-describedby="d14-verdict">
+        <output id="d14-out" for="d14-range">10 / 21</output>
+      </div>
+      <div class="verdict mid" id="d14-verdict">
+        <strong>8–14 · Signal, not yet habit</strong>
+        Keep the ritual identical and run 21 more days. If starting is not getting easier by then, switch the lever.
+      </div>
+    </div>
+    <p class="why">The thresholds are judgment calls, not research-derived cutoffs. If your baseline was near zero, even four started days may justify the "it works" branch. Adjust to your own baseline — but decide something at day 21, and judge two things: the count, and whether starting is getting easier. An experiment without a decision is a diary.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>If the count lands under 8 of 21, that result is useful: friction-reduction alone isn't enough, and a professional evaluation (executive function, ADHD, anxiety and perfectionism, mood, sleep) is the next step — not more self-help. Educational, not medical advice. Seek prompt help for severe depression, hopelessness, or thoughts of self-harm.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var minutes = 10;
+  var timerId = null;
+  var endAt = 0;
+
+  var durLabel = document.getElementById('dur-label');
+  var taskInput = document.getElementById('task-input');
+  var startBtn = document.getElementById('start-btn');
+  var commit = document.getElementById('commit');
+  var session = document.getElementById('session');
+  var clock = document.getElementById('clock');
+  var doingText = document.getElementById('doing-text');
+  var donePanel = document.getElementById('done-panel');
+  var returnNote = document.getElementById('return-note');
+
+  document.querySelectorAll('.chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+      chip.setAttribute('aria-pressed', 'true');
+      minutes = parseInt(chip.dataset.min, 10);
+      durLabel.textContent = minutes;
+    });
+  });
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+  }
+
+  function tick() {
+    var remaining = Math.round((endAt - Date.now()) / 1000);
+    clock.textContent = fmt(Math.max(remaining, 0));
+    if (remaining <= 0) {
+      clearInterval(timerId);
+      timerId = null;
+      clock.classList.add('done');
+      clock.textContent = '00:00';
+      donePanel.classList.add('show');
+      document.title = 'Time — stop and mark the day';
+      document.dispatchEvent(new CustomEvent('session:done'));
+    }
+  }
+
+  startBtn.addEventListener('click', function () {
+    var task = taskInput.value.trim() || 'the task I named';
+    doingText.textContent = task;
+    endAt = Date.now() + minutes * 60 * 1000;
+    clock.textContent = fmt(minutes * 60);
+    clock.classList.remove('done');
+    donePanel.classList.remove('show');
+    returnNote.classList.remove('show');
+    commit.style.display = 'none';
+    session.classList.add('on');
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(tick, 1000);
+    session.scrollIntoView({ block: 'start' });
+    document.dispatchEvent(new CustomEvent('session:start'));
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && timerId) tick();
+  });
+
+  document.getElementById('abandon-btn').addEventListener('click', function () {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+    session.classList.remove('on');
+    commit.style.display = 'block';
+    document.title = 'Start before you feel ready';
+    document.dispatchEvent(new CustomEvent('session:end'));
+  });
+
+  document.getElementById('drift-btn').addEventListener('click', function () {
+    returnNote.classList.add('show');
+    document.getElementById('later-input').focus();
+  });
+
+  var laterInput = document.getElementById('later-input');
+  var laterList = document.getElementById('later-list');
+  function addLater() {
+    var v = laterInput.value.trim();
+    if (!v) return;
+    var li = document.createElement('li');
+    li.textContent = v;
+    laterList.appendChild(li);
+    document.dispatchEvent(new CustomEvent('later:add', { detail: v }));
+    laterInput.value = '';
+    laterInput.focus();
+  }
+  document.getElementById('later-add').addEventListener('click', addLater);
+  laterInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') addLater(); });
+
+  document.querySelectorAll('.tcard > button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.parentElement;
+      var open = card.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.querySelector('.tog').textContent = open ? 'hide' : 'show';
+    });
+  });
+
+  var range = document.getElementById('d14-range');
+  var out = document.getElementById('d14-out');
+  var verdict = document.getElementById('d14-verdict');
+  function judge() {
+    var n = parseInt(range.value, 10);
+    out.textContent = n + ' / 21';
+    if (n >= 15) {
+      verdict.className = 'verdict good';
+      verdict.innerHTML = '<strong>15+ · It works</strong> Add exactly one pre-registered element — the weekly display: one five-minute explanation (teammate, doc, or post), scheduled before you prepare it. Nothing else yet.';
+    } else if (n >= 8) {
+      verdict.className = 'verdict mid';
+      verdict.innerHTML = '<strong>8–14 · Signal, not yet habit</strong> Keep the ritual identical and run 21 more days, judging whether starting is getting easier. If it is not, switch the lever — money stakes or the streak — with the ritual kept as garnish.';
+    } else {
+      verdict.className = 'verdict low';
+      verdict.innerHTML = '<strong>Under 8 · The experiment did its diagnostic job</strong> Friction-reduction alone is not enough. Book the professional evaluation now — executive function, ADHD, anxiety and perfectionism, mood, sleep. That is the protocol working, not failing.';
+    }
+  }
+  range.addEventListener('input', judge);
+  judge();
+})();
+</script>
+
+<script>
+(function () {
+  var wiz = document.getElementById('wizard');
+  var answers = {};
+  var history = [];
+
+  var QUESTIONS = {
+    kind: {
+      step: 'Question 1 · The task',
+      text: 'What are you actually facing?',
+      opts: [
+        { label: 'A concrete task I can name', sub: '"reply to Juan", "fix the Flow bug", "wash the dishes"', set: { kind: 'specific' }, next: 'urgency' },
+        { label: 'A vague obligation', sub: '"study", "clean", "get in shape", "work on the project"', set: { kind: 'vague' }, next: 'urgency' },
+        { label: 'A message or person I\'m avoiding', sub: 'unanswered email, chat, or call', set: { kind: 'message' }, next: 'msgstakes' },
+        { label: 'I don\'t even know — I just feel behind', sub: 'everything is circling, nothing is chosen', set: { kind: 'lost' }, next: 'RESULT' }
+      ]
+    },
+    msgstakes: {
+      step: 'Question 2 · Stakes',
+      text: 'Does silence have real consequences within 24 hours?',
+      opts: [
+        { label: 'Yes — work, money, or someone waiting on me', set: { msgUrgent: true }, next: 'RESULT' },
+        { label: 'No — it\'s guilt, not consequences', set: { msgUrgent: false }, next: 'RESULT' }
+      ]
+    },
+    urgency: {
+      step: 'Question 2 · Urgency',
+      text: 'When does this actually matter?',
+      opts: [
+        { label: 'Deadline within 24–48 hours', set: { urgency: 'now' }, next: 'feeling' },
+        { label: 'This week', set: { urgency: 'week' }, next: 'feeling' },
+        { label: 'No real deadline', sub: 'self-driven: learning, health, home, side project', set: { urgency: 'none' }, next: 'feeling' }
+      ]
+    },
+    feeling: {
+      step: 'Question 3 · The feeling',
+      text: 'What is the dominant feeling right now?',
+      opts: [
+        { label: 'Resistance — I don\'t want to do it', set: { feeling: 'aversion' }, next: 'energy' },
+        { label: 'Fog — too big, no idea where to start', set: { feeling: 'overwhelm' }, next: 'energy' },
+        { label: 'Restless — I start but can\'t stay on it', set: { feeling: 'drift' }, next: 'energy' },
+        { label: 'Not ready — I need a better method or more prep first', set: { feeling: 'perfectionism' }, next: 'energy' },
+        { label: 'Nothing strong — I just haven\'t started', set: { feeling: 'inertia' }, next: 'energy' }
+      ]
+    },
+    energy: {
+      step: 'Question 4 · Energy',
+      text: 'How is your energy right now?',
+      opts: [
+        { label: 'Workable', set: { energy: 'ok' }, next: 'attempts' },
+        { label: 'Low — tired, end of day, running on fumes', set: { energy: 'low' }, next: 'attempts' }
+      ]
+    },
+    attempts: {
+      step: 'Question 5 · History',
+      text: 'Have you already tried and failed to start this same task?',
+      opts: [
+        { label: 'No — first real attempt', set: { attempts: 'first' }, next: 'RESULT' },
+        { label: 'Yes — two or more failed attempts', set: { attempts: 'failed' }, next: 'RESULT' }
+      ]
+    }
+  };
+
+  var SCRIPTS = {
+    aversion: '"I don\'t need to want it. I need five minutes and a smaller target."',
+    overwhelm: '"The task is not the unit. The start is the unit."',
+    drift: '"Returning is the skill I\'m training."',
+    perfectionism: '"Preparation is replacing action. Ten ordinary minutes first."',
+    inertia: '"Starting is cheap. I\'ll decide whether to continue once I\'m in."'
+  };
+
+  function buildResult() {
+    var a = answers;
+
+    if (a.kind === 'lost') {
+      return {
+        head: 'Don\'t pick a task yet — dump first',
+        rows: [
+          ['First move', 'Three-minute brain dump. Paper, phone notes, anywhere. Write every circling item without sorting or judging.'],
+          ['Then', 'Circle exactly one item. Not the most important — the one you can physically touch in the next minute. The rest stays parked on the page.'],
+          ['Timer', '3 min for the dump, then run the triage again with your circled task.']
+        ],
+        notes: ['Choosing while anxious-scanning produces either paralysis or the easiest-but-useless task. Externalize the list first, choose second.'],
+        timer: 5, prefill: 'brain dump: write everything circling in my head'
+      };
+    }
+
+    if (a.kind === 'message') {
+      if (a.msgUrgent) {
+        return {
+          head: 'Bridge now, real reply today',
+          rows: [
+            ['First move', 'Send within the next two minutes: "I saw this. I\'m on it — full answer by [time today]." Naming a time converts guilt into a deadline you control.'],
+            ['Then', 'Block 15 minutes today for the real reply. Answering one part well beats a complete answer that never ships.'],
+            ['Say this', '"A bridge beats silence."'],
+            ['Person', 'The recipient is your accountability — you just told them when.']
+          ],
+          notes: ['If the full answer needs information you don\'t have, say that in the bridge. "I need to check X first" is a legitimate complete reply.'],
+          timer: 15, prefill: 'write the real reply I promised in the bridge message'
+        };
+      }
+      return {
+        head: 'Send an imperfect reply now',
+        rows: [
+          ['First move', 'Either a bridge ("I saw this, I\'ll reply properly soon") or answer just one small part of it — whichever is faster. Two minutes, now.'],
+          ['Say this', '"A bridge beats silence."'],
+          ['Then', 'If it genuinely matters, put the follow-up in your calendar. If you notice you never schedule it, the honest answer may be that it doesn\'t matter — say so and close it.']
+        ],
+        notes: ['Guilt-driven avoidance compounds daily; the message gets harder to answer the longer it sits. The cost is in the waiting, not the writing.'],
+        timer: 5, prefill: 'send one bridge or partial reply'
+      };
+    }
+
+    var rows = [];
+    var notes = [];
+    var timer = 10;
+    var prefill = '';
+
+    if (a.kind === 'vague') {
+      rows.push(['First move', 'Convert it. "Study" is not a task; "read pages 4–7 and write three points" is. Writing the smallest physical action IS today\'s first win — it counts.']);
+      prefill = 'define the smallest physical first action for this';
+    } else {
+      rows.push(['First move', 'Write the one sentence: "For the next N minutes I am doing: ____." Physical and observable, or it doesn\'t count.']);
+    }
+
+    switch (a.feeling) {
+      case 'aversion':
+        timer = 5;
+        rows.push(['Approach', 'Shrink to one visible result — three dishes, one paragraph, one clear surface. Add music, a podcast, or a call. You are allowed to stop when the timer ends; that\'s the deal that gets you in.']);
+        break;
+      case 'overwhelm':
+        timer = 10;
+        rows.push(['Approach', 'Do NOT plan the whole thing. Pick one physical corner of it and touch only that. Planning the mountain is how the fog wins; the map can be drawn from inside.']);
+        break;
+      case 'drift':
+        timer = 15;
+        rows.push(['Approach', 'Task sentence visible on paper next to you. Phone in another room. Later list ready before you start. Every return after a drift counts as a success — track returns, not focus.']);
+        break;
+      case 'perfectionism':
+        timer = 10;
+        rows.push(['Approach', 'Use the ordinary method you already have. Research, tooling, and system design are permitted only after the session ends — write that down if the urge appears mid-session.']);
+        break;
+      case 'inertia':
+        timer = 10;
+        rows.push(['Approach', 'No diagnosis needed — this is the cheapest case. Stand up, move to the task\'s location, start the timer during the walk. Decide nothing; just relocate your body first.']);
+        break;
+    }
+
+    rows.push(['Say this', SCRIPTS[a.feeling]]);
+
+    if (a.urgency === 'now') {
+      rows.push(['Ritual', 'Run it in full — especially under deadline. Panic skips rituals and produces thrash instead of work; the ritual aims the pressure. If you are still frozen ten minutes in, escalate to a person for this one task.']);
+      notes.push('Scope ruthlessly: the one deliverable only. No research, no inbox, no cleaning around the task.');
+      if (timer < 10) timer = 10;
+    } else if (a.urgency === 'week') {
+      rows.push(['Ritual', 'Full sequence, then start. This-week tasks are the ones that silently become 24-hour crises on Thursday — today\'s ritual is what prevents that.']);
+      notes.push('Do the first session today, not "when there\'s time." The deadline feels far exactly until it doesn\'t.');
+    } else {
+      rows.push(['Ritual', 'Ritual plus an appointment: "At [time] in [place] I run the ritual and start." No-deadline tasks don\'t fail dramatically — they just never happen. The slot replaces the deadline nobody set; the ritual is what makes the slot fire. If it\'s a learning task, also name the audience: who hears the five-minute version by Friday?']);
+    }
+
+    if (a.energy === 'low') {
+      timer = 5;
+      notes.push('Low energy: pick the mechanical version — gather, format, copy, tidy, list. No decisions, no creative work tonight.');
+      notes.push('Alternative that also counts: schedule it concretely for tomorrow morning and stop. One scheduled deferral is discipline; a second one in a row is avoidance.');
+    }
+
+    if (a.attempts === 'failed') {
+      notes.push('Two-plus failed attempts means the downshift ladder applies now: this prescription already halves the timer — if it fails again, change location; if that fails, do it live on a call. Solo starting has been tested enough on this task.');
+      if (timer > 5) timer = 5;
+      rows = rows.map(function (r) {
+        return r[0] === 'Ritual' ? ['Escalate', 'The ritual has been tested enough on this task. Do this one live on a call or with someone present — the person is the fallback the ritual earns after two failures, not the default.'] : r;
+      });
+    }
+
+    rows.splice(2, 0, ['Timer', timer + ' minutes. Stop when it ends, even mid-momentum.']);
+
+    return { head: 'Your prescription', rows: rows, notes: notes, timer: timer, prefill: prefill };
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function renderQuestion(id) {
+    var q = QUESTIONS[id];
+    var html = '<div class="wstep">' + esc(q.step) + '</div><div class="wq">' + esc(q.text) + '</div><div class="wopts">';
+    q.opts.forEach(function (o, i) {
+      html += '<button class="wopt" data-i="' + i + '">' + esc(o.label) + (o.sub ? '<small>' + esc(o.sub) + '</small>' : '') + '</button>';
+    });
+    html += '</div>';
+    if (history.length) html += '<button class="wback">&larr; Back</button>';
+    wiz.innerHTML = html;
+    wiz.querySelectorAll('.wopt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var o = q.opts[parseInt(btn.dataset.i, 10)];
+        history.push({ id: id, answers: JSON.parse(JSON.stringify(answers)) });
+        Object.keys(o.set).forEach(function (k) { answers[k] = o.set[k]; });
+        if (o.next === 'RESULT') renderResult(); else renderQuestion(o.next);
+      });
+    });
+    bindBack();
+  }
+
+  function renderResult() {
+    var r = buildResult();
+    var html = '<div class="wresult"><div class="wstep">Prescription</div><div class="rhead">' + esc(r.head) + '</div>';
+    r.rows.forEach(function (row) {
+      html += '<div class="rrow"><div class="rlbl">' + esc(row[0]) + '</div><div class="rval">' + esc(row[1]) + '</div></div>';
+    });
+    if (r.notes && r.notes.length) {
+      html += '<ul class="wnotes">';
+      r.notes.forEach(function (n) { html += '<li>' + esc(n) + '</li>'; });
+      html += '</ul>';
+    }
+    html += '<div class="wactions"><button class="primary" id="wload">Load into the timer</button><button class="wback" style="margin-top:0">Back</button> <button class="ghost-btn" id="wrestart">Start over</button></div></div>';
+    wiz.innerHTML = html;
+    bindBack();
+    document.getElementById('wrestart').addEventListener('click', reset);
+    document.getElementById('wload').addEventListener('click', function () {
+      var t = r.timer <= 5 ? 5 : (r.timer >= 15 ? 15 : 10);
+      document.querySelectorAll('.chip').forEach(function (c) {
+        if (parseInt(c.dataset.min, 10) === t) c.click();
+      });
+      var input = document.getElementById('task-input');
+      if (r.prefill && !input.value.trim()) input.value = r.prefill;
+      document.getElementById('commit').scrollIntoView({ block: 'center' });
+      input.focus();
+    });
+  }
+
+  function bindBack() {
+    var back = wiz.querySelector('.wback');
+    if (!back) return;
+    back.addEventListener('click', function () {
+      var prev = history.pop();
+      if (!prev) return reset();
+      answers = prev.answers;
+      renderQuestion(prev.id);
+    });
+  }
+
+  function reset() {
+    answers = {};
+    history = [];
+    renderQuestion('kind');
+  }
+
+  reset();
+})();
+</script>
+
+<script>
+(function () {
+  var KEY = 'startProtocol.v1';
+  var canStore = false;
+  try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); canStore = true; } catch (e) {}
+  var state = { days: {}, next: '', later: [], cards: {} };
+  if (canStore) {
+    try { var raw = localStorage.getItem(KEY); if (raw) state = Object.assign(state, JSON.parse(raw)); } catch (e) {}
+  }
+  function save() { if (!canStore) return; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function dkey(d) {
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+
+  var note = document.getElementById('storage-note');
+  if (!canStore) note.textContent = 'Storage unavailable in this environment — data lives only until reload. In the installed app on your phone, everything persists.';
+
+  var grid = document.getElementById('track-grid');
+  var stats = document.getElementById('track-stats');
+  function render() {
+    grid.innerHTML = '';
+    var today = new Date();
+    var count21 = 0;
+    for (var i = 20; i >= 0; i--) {
+      var d = new Date(today); d.setDate(today.getDate() - i);
+      var k = dkey(d);
+      var cell = document.createElement('div');
+      cell.className = 'cell' + (state.days[k] ? ' on' : '') + (i === 0 ? ' today' : '');
+      cell.title = k;
+      grid.appendChild(cell);
+      if (state.days[k]) count21++;
+    }
+    var streak = 0;
+    var cur = new Date(today);
+    if (!state.days[dkey(cur)]) cur.setDate(cur.getDate() - 1);
+    while (state.days[dkey(cur)]) { streak++; cur.setDate(cur.getDate() - 1); }
+    var total = Object.keys(state.days).length;
+    stats.textContent = 'streak ' + streak + ' \u00b7 last 21: ' + count21 + ' \u00b7 total ' + total;
+    var range = document.getElementById('d14-range');
+    if (range && total > 0) {
+      range.value = Math.min(count21, 21);
+      range.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function markToday() {
+    state.days[dkey(new Date())] = 1;
+    save(); render();
+    var mn = document.getElementById('marked-note');
+    if (mn) mn.textContent = 'Marked. Day counted.';
+  }
+  document.getElementById('mark-btn').addEventListener('click', markToday);
+  document.getElementById('mark-today-2').addEventListener('click', markToday);
+
+  var nextInput = document.getElementById('next-input');
+  document.getElementById('next-save').addEventListener('click', function () {
+    state.next = nextInput.value.trim(); save();
+    document.getElementById('marked-note').textContent = state.next ? 'Saved. It will be waiting at your next session.' : 'Cleared.';
+  });
+  var lastnext = document.getElementById('lastnext');
+  if (state.next) {
+    var t = document.createElement('span');
+    t.textContent = 'Left off at: ' + state.next + ' ';
+    var b = document.createElement('button');
+    b.textContent = 'Use it'; b.className = 'use-next';
+    b.addEventListener('click', function () {
+      var ti = document.getElementById('task-input');
+      ti.value = state.next; ti.focus();
+    });
+    lastnext.appendChild(t); lastnext.appendChild(b);
+  }
+
+  var laterList = document.getElementById('later-list');
+  state.later.forEach(function (v) {
+    var li = document.createElement('li'); li.textContent = v; laterList.appendChild(li);
+  });
+  document.addEventListener('later:add', function (e) { state.later.push(e.detail); save(); });
+  document.getElementById('later-clear').addEventListener('click', function () {
+    state.later = []; save(); laterList.innerHTML = '';
+    note.textContent = 'Later list cleared — every item scheduled, done, or deleted.';
+  });
+
+  document.getElementById('export-btn').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'start-protocol-data.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+
+  var lock = null, active = false;
+  function getLock() {
+    if (!('wakeLock' in navigator)) return;
+    navigator.wakeLock.request('screen').then(function (l) { lock = l; }).catch(function () {});
+  }
+  function dropLock() { if (lock) { lock.release().catch(function () {}); lock = null; } }
+  document.addEventListener('session:start', function () { active = true; getLock(); });
+  document.addEventListener('session:done', function () {
+    active = false; dropLock();
+    if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200]); } catch (e) {} }
+  });
+  document.addEventListener('session:end', function () { active = false; dropLock(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && active) getLock(); });
+
+  var strip = function (s) { return s.replace(/^[\u201c"]+|[\u201d"]+$/g, ''); };
+  document.querySelectorAll('.tcard').forEach(function (card, i) {
+    var qEl = card.querySelector('.q');
+    var sayEl = card.querySelector('.say');
+    var actEl = card.querySelector('.act');
+    var c = state.cards[i];
+    if (c) {
+      qEl.textContent = '\u201c' + c.q + '\u201d';
+      sayEl.textContent = '\u201c' + c.say + '\u201d';
+      actEl.textContent = c.act;
+    }
+    var counter = card.querySelector('.counter');
+    var edit = document.createElement('button');
+    edit.className = 'card-edit';
+    edit.textContent = 'Edit \u2014 replace with your verbatim thought';
+    counter.appendChild(edit);
+    edit.addEventListener('click', function () {
+      if (counter.querySelector('.card-form')) return;
+      var f = document.createElement('div'); f.className = 'card-form';
+      function field(lbl, val) {
+        var w = document.createElement('label'); w.textContent = lbl;
+        var inp = document.createElement('input'); inp.type = 'text'; inp.value = val;
+        w.appendChild(inp); f.appendChild(w); return inp;
+      }
+      var fq = field('The thought, verbatim, any language', strip(qEl.textContent));
+      var fs = field('The counter-script', strip(sayEl.textContent));
+      var fa = field('The physical move', actEl.textContent);
+      var saveB = document.createElement('button'); saveB.textContent = 'Save'; saveB.className = 'card-save';
+      saveB.addEventListener('click', function () {
+        state.cards[i] = { q: fq.value.trim(), say: fs.value.trim(), act: fa.value.trim() };
+        save();
+        qEl.textContent = '\u201c' + state.cards[i].q + '\u201d';
+        sayEl.textContent = '\u201c' + state.cards[i].say + '\u201d';
+        actEl.textContent = state.cards[i].act;
+        f.remove();
+      });
+      f.appendChild(saveB);
+      counter.appendChild(f);
+    });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
