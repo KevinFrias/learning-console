@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HTML Portal</title>
+<style>
+  :root { --bg:#0b0d13; --bg2:#12151f; --bg3:#1a1e2c; --border:#262c3f; --text:#e7eaf0; --muted:#6f7995; --accent:#6ee7ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,Segoe UI,Inter,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:40px 28px; }
+  header { margin-bottom:34px; }
+  h1 { font-size:14px; letter-spacing:.3em; text-transform:uppercase; color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  a.card { display:block; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:24px 20px; text-decoration:none; color:var(--text); transition:transform .12s,border-color .15s,background .15s; }
+  a.card:hover { transform:translateY(-2px); border-color:#3d455e; background:var(--bg3); }
+  .card .name { font-size:20px; font-weight:600; word-break:break-word; }
+  .card .meta { margin-top:8px; font-size:13px; color:var(--muted); }
+  .empty { color:var(--muted); padding:40px 20px; text-align:center; }
+</style>
+</head>
+<body>
+  <header><h1>HTML Portal</h1></header>
+  <div class="grid">
+    <a class="card" href="Improvement/"><div class="name">Improvement</div><div class="meta">1 page</div></a>
+    <a class="card" href="Learning/"><div class="name">Learning</div><div class="meta">1 page</div></a>
+  </div>
+</body>
+</html>

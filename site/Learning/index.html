@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Learning — HTML Portal</title>
+<style>
+  :root { --bg:#0b0d13; --bg2:#12151f; --bg3:#1a1e2c; --border:#262c3f; --text:#e7eaf0; --muted:#6f7995; --accent:#6ee7ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,Segoe UI,Inter,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:40px 28px; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  h1 { font-size:14px; letter-spacing:.3em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+  .crumb { color:var(--muted); font-size:13px; margin-bottom:22px; }
+  .title { font-size:42px; font-weight:700; margin-bottom:8px; letter-spacing:-.02em; line-height:1.1; }
+  .meta { color:var(--muted); margin-bottom:22px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+  a.card { display:flex; justify-content:space-between; align-items:center; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:18px 18px; text-decoration:none; color:var(--text); transition:transform .12s,border-color .15s,background .15s; }
+  a.card:hover { transform:translateY(-1px); border-color:#3d455e; background:var(--bg3); }
+  .card .name { font-size:16px; font-weight:500; }
+  .card .fn { font-size:12px; color:var(--muted); font-family:ui-monospace,Menlo,monospace; }
+  .empty { color:var(--muted); padding:40px 20px; text-align:center; border:1px dashed var(--border); border-radius:8px; }
+</style>
+</head>
+<body>
+  <h1>HTML Portal</h1>
+  <div class="crumb"><a href="/">← Directories</a></div>
+  <div class="title">Learning</div>
+  <div class="meta">1 page</div>
+  <div class="grid">
+    <a class="card" href="welcome.html"><div class="name">welcome</div><div class="fn">welcome.html</div></a>
+  </div>
+</body>
+</html>
